@@ -18,6 +18,9 @@ import * as z from "zod"
 import { eventDefaultValues } from "@/constants"
 import Dropdown from "./Dropdown"
 import { Textarea } from "@/components/ui/textarea"
+import { useState } from "react"
+import { FileUploader } from "./FileUpload"
+import Image from "next/image"
 
 
 type EventFormProps = {
@@ -26,6 +29,8 @@ type EventFormProps = {
 }
 
 const EventForm = ({ userId, type }: EventFormProps) => {
+
+  const [file,setFile] = useState<File[]>([])
 
   const initialValues = eventDefaultValues;
 
@@ -43,65 +48,88 @@ const EventForm = ({ userId, type }: EventFormProps) => {
 
       return (
         <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-5">
         <div className="flex flex-col gap-5 md:flex-row">
+          <FormField
+            control={form.control}
+            name="title"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <Input placeholder="Event title" {...field} className="input-field" />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="categoryId"
+            render={({ field }) => (
+              <FormItem className="w-full">
+                <FormControl>
+                  <Dropdown onChangeHandler={field.onChange} value={field.value} />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
 
-            <FormField
+        <div className="flex flex-col gap-5 md:flex-row">
+          <FormField
               control={form.control}
-              name="categoryId"
+              name="description"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormControl>
-                    <Input placeholder="Event title" {...field} className="input-field" />
+                  <FormControl className="h-72">
+                    <Textarea placeholder="Description" {...field} className="textarea rounded-2xl" />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            <FormField
+          <FormField
               control={form.control}
-              name="title"
+              name="imageUrl"
               render={({ field }) => (
                 <FormItem className="w-full">
-                  <FormControl>
-                    <Dropdown onChangeHandler={field.onChange} value={field.value} />
+                  <FormControl className="h-72">
+                    <FileUploader 
+                      onFieldChange={field.onChange}
+                      imageUrl={field.value}
+                      setFiles={setFile}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
               )}
             />
-
-            </div>
+        </div>
 
             <div className="flex flex-col gap-5 md:flex-row">
-
               <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormControl>
-                      <Textarea placeholder="Description" {...field} className="textarea rounded-2xl" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                  control={form.control}
+                  name="location"
+                  render={({ field }) => (
+                    <FormItem className="w-full">
+                      <FormControl>
+                        <div className="flex-center h-[54px] w-full overflow-hidden rounded-full bg-grey-50 px-4 py-2">
+                          <Image
+                            src="/assets/icons/location-grey.svg"
+                            alt="calendar"
+                            width={24}
+                            height={24}
+                          />
 
-              <FormField
-                control={form.control}
-                name="imageUrl"
-                render={({ field }) => (
-                  <FormItem className="w-full">
-                    <FormControl>
-                      <Textarea placeholder="Description" {...field} className="textarea rounded-2xl" />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                          <Input placeholder="Event location or Online" {...field} className="input-field" />
+                        </div>
 
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
             </div>
 
             <Button type="submit">Submit</Button>
