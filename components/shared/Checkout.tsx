@@ -21,16 +21,23 @@ const Checkout = ({ event, userId }: { event: IEvent, userId: string }) => {
   }, []);
 
   const onCheckout = async () => {
-    const order = {
+    const order: {
+      eventTitle: string;
+      eventId: string;
+      price: string; // Ensure price is always a string
+      isFree: boolean;
+      buyerId: string;
+    } = {
       eventTitle: event.title,
-      eventId: event._id,
-      price: event.price,
+      eventId: String(event._id) as string,
+      price: event.price ?? '0', // Provide a default value if price is undefined
       isFree: event.isFree,
-      buyerId: userId
-    }
-
+      buyerId: userId,
+    };
+  
     await checkoutOrder(order);
-  }
+  };
+  
 
   return (
     <form action={onCheckout} method="post">
